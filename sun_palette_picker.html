@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sun palette picker</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 720px;
+      margin: 24px auto;
+      padding: 0 16px;
+      background: #1a1a1a;
+      color: #eee;
+    }
+    h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+    .meta { color: #aaa; font-size: 0.9rem; margin-bottom: 16px; }
+    .stats { color: #8cf; font-size: 0.85rem; margin-bottom: 12px; }
+    .frame {
+      position: relative;
+      width: 512px;
+      height: 512px;
+      margin: 0 auto 20px;
+      background: #000;
+      border: 1px solid #444;
+    }
+    #sky {
+      width: 512px;
+      height: 512px;
+      image-rendering: pixelated;
+      display: block;
+    }
+    #overlay {
+      position: absolute;
+      left: 0; top: 0;
+      width: 512px;
+      height: 512px;
+      pointer-events: none;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    button {
+      font-size: 1.05rem;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #clouded { background: #8b4513; color: #fff; }
+    #clouded:hover { background: #a0522d; }
+    #clean { background: #2a8f2a; color: #fff; }
+    #clean:hover { background: #34a834; }
+    #done { text-align: center; font-size: 1.1rem; color: #8f8; padding: 24px; }
+    .hint { text-align: center; color: #888; font-size: 0.85rem; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>Sun palette picker</h1>
+    <p class="meta" id="label">Loading…</p>
+    <p class="stats" id="stats"></p>
+    <div class="frame">
+      <img id="sky" alt="sky" />
+      <canvas id="overlay" width="512" height="512"></canvas>
+    </div>
+    <div class="buttons" id="buttons">
+      <button type="button" id="clouded">Clouded sun</button>
+      <button type="button" id="clean">Clean sun</button>
+    </div>
+    <p class="hint">Both buttons save the 5×5 patch at the yellow + (predicted sun).</p>
+  </div>
+  <div id="done" style="display:none"></div>
+
+  <script>
+    const SCALE = 8;
+    const sky = document.getElementById("sky");
+    const overlay = document.getElementById("overlay");
+    const ctx = overlay.getContext("2d");
+    const label = document.getElementById("label");
+    const stats = document.getElementById("stats");
+    const doneEl = document.getElementById("done");
+    const app = document.getElementById("app");
+    const btnClouded = document.getElementById("clouded");
+    const btnClean = document.getElementById("clean");
+
+    function drawOverlay(col, row, patchSize) {
+      ctx.clearRect(0, 0, 512, 512);
+      const x = col * SCALE;
+      const y = row * SCALE;
+      const half = Math.floor(patchSize / 2);
+      const px = (col - half) * SCALE;
+      const py = (row - half) * SCALE;
+      const sz = patchSize * SCALE;
+
+      ctx.strokeStyle = "#0f0";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px + 0.5, py + 0.5, sz - 1, sz - 1);
+
+      ctx.strokeStyle = "#ff0";
+      ctx.lineWidth = 2;
+      const cs = 6;
+      ctx.beginPath();
+      ctx.moveTo(x - cs, y); ctx.lineTo(x + cs, y);
+      ctx.moveTo(x, y - cs); ctx.lineTo(x, y + cs);
+      ctx.stroke();
+    }
+
+    async function refresh() {
+      const r = await fetch("/api/state");
+      const d = await r.json();
+      if (d.done) {
+        app.style.display = "none";
+        doneEl.style.display = "block";
+        doneEl.textContent =
+          `Done. Clouded: ${d.count_clouded}, Clean: ${d.count_clean}. Close this tab.`;
+        return;
+      }
+      sky.src = "data:image/png;base64," + d.image_b64;
+      label.textContent = `[${d.index + 1} / ${d.total}]  ${d.filename}  —  ${d.time}`;
+      stats.textContent =
+        `Clouded: ${d.count_clouded}  |  Clean: ${d.count_clean}  |  Sun col=${d.sun_col}, row=${d.sun_row}`;
+      drawOverlay(d.sun_col, d.sun_row, d.patch_size);
+    }
+
+    async function post(path) {
+      btnClouded.disabled = true;
+      btnClean.disabled = true;
+      await fetch(path, { method: "POST" });
+      btnClouded.disabled = false;
+      btnClean.disabled = false;
+      await refresh();
+    }
+
+    btnClouded.onclick = () => post("/api/clouded");
+    btnClean.onclick = () => post("/api/clean");
+    refresh();
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.env
+.venv/
+venv/
+
+# Generated data, checkpoints, and caches (regenerate locally)
+output/
+cache/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
