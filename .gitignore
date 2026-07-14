@@ -11,6 +11,7 @@ venv/
 # Generated data, checkpoints, and caches (regenerate locally)
 output/
 cache/
+data/
 
 # Editor / OS
 .DS_Store

@@ -10,7 +10,6 @@ Approved pairs are appended to --dataset-dir (default: output/dataset_round2).
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -18,6 +17,7 @@ import torch
 from tqdm import tqdm
 
 from disk_mask import mask_labels_outside_disk, zero_outside_fisheye
+from lib.sun_position_identification import sun_position
 from review_ui import ReviewItem, run_review_ui, setup_matplotlib_backend
 from skippd_io import (
     DATA_DIR,
@@ -34,9 +34,6 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_CHECKPOINT = ROOT / "output" / "checkpoints" / "unet_best.pt"
 DEFAULT_DATASET_OUT = ROOT / "output" / "dataset_round2"
 DEFAULT_TRAIN_DATASET = ROOT / "output" / "dataset"
-CLOUD_CODES = ROOT.parent / "Cloud-dection-in-sky-images" / "codes"
-sys.path.insert(0, str(CLOUD_CODES))
-from sun_position_identification import sun_position  # noqa: E402
 
 
 def load_model(checkpoint_path: Path, device: torch.device) -> tuple[UNet64, int]:

@@ -11,17 +11,13 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-LACISE_ROOT = Path(__file__).resolve().parent.parent
-MANUAL_SEG_ROOT = Path(__file__).resolve().parent
-DATA_DIR = (LACISE_ROOT / "SkyGPT" / "Codes" / "CloudPred-PV" / "Data").resolve()
-PATH_CACHE_DIR = MANUAL_SEG_ROOT / "cache"
+from paths import CACHE_DIR, DATA_DIR, DEFAULT_MANIFEST, IMAGE_INDEX_PICKLE, ROOT
 
-# Written by Cloud-dection-in-sky-images/codes/run_skippd_cloud_demo.py
-CLOUD_DEMO_MANIFEST = (
-    LACISE_ROOT / "Cloud-dection-in-sky-images" / "output" / "random_20_demo" / "image_manifest.txt"
-)
-# Built by Simple_newcast (fast path — avoids scanning 131k JPGs on WSL)
-IMAGE_INDEX_PICKLE = LACISE_ROOT / "Simple_newcast" / "cache" / "image_pv_index.pkl"
+MANUAL_SEG_ROOT = ROOT
+PATH_CACHE_DIR = CACHE_DIR
+
+# Optional fixed image list (e.g. write_cloud_manifest.py -> data/image_manifest.txt)
+CLOUD_DEMO_MANIFEST = DEFAULT_MANIFEST
 
 # Clear-sky reference days from Nie et al. / cloud-detection README
 CLEAR_DAYS = [(5, 20), (8, 15), (9, 23), (10, 22)]
@@ -84,7 +80,7 @@ def _save_path_manifest(paths: list[Path], manifest_path: Path) -> None:
 
 
 def collect_jpg_paths_from_index() -> list[Path] | None:
-    """Load JPG paths from Simple_newcast cache if available (unsorted)."""
+    """Load JPG paths from cache/image_index.pkl if available (unsorted)."""
     if not IMAGE_INDEX_PICKLE.is_file():
         return None
     with open(IMAGE_INDEX_PICKLE, "rb") as f:
@@ -162,7 +158,7 @@ def collect_jpg_paths_sorted(data_dir: Path, *, rebuild: bool = False) -> list[P
     _write_path_meta(
         meta_path,
         {
-            "source": "image_pv_index.pkl" if IMAGE_INDEX_PICKLE.is_file() else "filesystem_scan",
+            "source": "image_index.pkl" if IMAGE_INDEX_PICKLE.is_file() else "filesystem_scan",
             "source_mtime": source_mtime,
             "count": len(paths),
         },

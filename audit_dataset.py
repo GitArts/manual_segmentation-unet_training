@@ -12,13 +12,13 @@ from __future__ import annotations
 
 import argparse
 import random
-import sys
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
 from audit_ui import AuditItem, run_audit_ui
+from lib.sun_position_identification import sun_position
 from review_ui import setup_matplotlib_backend
 from seg_dataset import list_paired_stems
 from skippd_io import datetime_from_filename
@@ -28,9 +28,6 @@ DEFAULT_DATASET_DIRS = [
     ROOT / "output" / "dataset",
     ROOT / "output" / "dataset_round2",
 ]
-CLOUD_CODES = ROOT.parent / "Cloud-dection-in-sky-images" / "codes"
-sys.path.insert(0, str(CLOUD_CODES))
-from sun_position_identification import sun_position  # noqa: E402
 
 
 def collect_pairs(dataset_dirs: list[Path]) -> list[tuple[Path, Path, Path]]:

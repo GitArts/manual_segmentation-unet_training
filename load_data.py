@@ -1,11 +1,13 @@
 """
 Load random sky images from the local SKIPP'D dataset.
 
-Dataset layout (same as Cloud-dection-in-sky-images/codes/run_skippd_cloud_demo.py):
-  SkyGPT/Codes/CloudPred-PV/Data/
+Dataset layout (SKIPP'D fisheye sky images under data/ by default):
+  data/
     2017_03_images_raw/03/01/20170301060000.jpg
     2017_05_images_raw/05/20/20170520120000.jpg
     ...
+
+Override location: set SKIPPD_DATA_DIR or pass --data-dir.
 
 Each filename is YYYYMMDDHHMMSS (1-minute cadence during daylight).
 Images are fisheye sky photos from Stanford; we load them as 64x64 RGB uint8
@@ -15,7 +17,6 @@ Images are fisheye sky photos from Stanford; we load them as 64x64 RGB uint8
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -24,6 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from lib.sun_position_identification import sun_position
 from skippd_io import (
     CLOUD_DEMO_MANIFEST,
     DATA_DIR,
@@ -33,9 +35,6 @@ from skippd_io import (
 )
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output" / "sample_images"
-CLOUD_CODES = Path(__file__).resolve().parent.parent / "Cloud-dection-in-sky-images" / "codes"
-sys.path.insert(0, str(CLOUD_CODES))
-from sun_position_identification import sun_position  # noqa: E402
 
 
 def overlay_sun(image: np.ndarray, sun_mask: np.ndarray) -> np.ndarray:

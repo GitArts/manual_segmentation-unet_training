@@ -24,23 +24,14 @@ from __future__ import annotations
 
 
 import argparse
-
-import sys
-
 from datetime import datetime
-
 from pathlib import Path
 
-
-
 import numpy as np
-
 from PIL import Image
 
-
-
 from edge_filter import edge_overlay
-
+from lib.sun_position_identification import sun_position
 from review_ui import ReviewItem, run_review_ui, setup_matplotlib_backend
 
 from segment_nrbr import colorize_labels, load_sun_lum_threshold, overlay_labels, segment
@@ -68,13 +59,6 @@ from skippd_io import (
 OUTPUT_DIR = Path(__file__).resolve().parent / "output" / "combined_demo"
 
 DATASET_DIR = Path(__file__).resolve().parent / "output" / "dataset"
-
-CLOUD_CODES = Path(__file__).resolve().parent.parent / "Cloud-dection-in-sky-images" / "codes"
-
-sys.path.insert(0, str(CLOUD_CODES))
-
-from sun_position_identification import sun_position  # noqa: E402
-
 
 
 

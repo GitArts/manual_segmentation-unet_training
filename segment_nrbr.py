@@ -9,7 +9,7 @@ Classes (match SkyGPT convention where possible):
   4 sun_clouded — sun disk, cloud-attenuated (from palette stats)
 
 NRBR = (B - R) / (B + R)   using RGB channels only (no green).
-Sun position from sun_position_identification (timestamp).
+Sun position from lib/sun_position_identification (timestamp in filename).
 Luminance threshold for clean vs clouded sun from sun_palette_analysis.json if present.
 """
 

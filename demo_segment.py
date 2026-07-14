@@ -8,7 +8,6 @@ Demo NRBR segmentation on random SKIPP'D images.
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -17,6 +16,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from lib.cloud_detection import cloud_detection
+from lib.sun_position_identification import sun_position
 from segment_nrbr import colorize_labels, load_sun_lum_threshold, overlay_labels, segment
 from skippd_io import (
     CLOUD_DEMO_MANIFEST,
@@ -27,9 +28,6 @@ from skippd_io import (
 )
 
 OUTPUT_DIR = Path(__file__).resolve().parent / "output" / "segment_demo"
-CLOUD_CODES = Path(__file__).resolve().parent.parent / "Cloud-dection-in-sky-images" / "codes"
-sys.path.insert(0, str(CLOUD_CODES))
-from sun_position_identification import sun_position  # noqa: E402
 
 
 def main() -> None:
@@ -85,8 +83,6 @@ def main() -> None:
         axes[2].axis("off")
 
         if args.compare:
-            from cloud_detection import cloud_detection
-
             _, cloud_mask, sun_mask = cloud_detection(t, img)
             cloud = cloud_mask[:, :, 1] > 0
             sun = sun_mask[:, :, 0] > 0

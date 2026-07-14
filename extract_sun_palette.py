@@ -17,7 +17,6 @@ import argparse
 import base64
 import json
 import random
-import sys
 import threading
 import webbrowser
 from datetime import datetime
@@ -32,6 +31,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from lib.sun_position_identification import sun_position
 from skippd_io import (
     CLEAR_DAYS,
     DATA_DIR,
@@ -46,10 +46,6 @@ from skippd_io import (
 OUTPUT_DIR = Path(__file__).resolve().parent / "output" / "sun_palette"
 HTML_PATH = Path(__file__).resolve().parent / "sun_palette_picker.html"
 DEFAULT_PORT = 8765
-
-CLOUD_CODES = Path(__file__).resolve().parent.parent / "Cloud-dection-in-sky-images" / "codes"
-sys.path.insert(0, str(CLOUD_CODES))
-from sun_position_identification import sun_position  # noqa: E402
 
 
 def load_sample_paths(
